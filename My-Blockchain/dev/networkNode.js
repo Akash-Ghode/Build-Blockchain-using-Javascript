@@ -41,7 +41,6 @@ app.get('/mine', function (req, res) {
     });
 });
 
-//register a node and broadcast itthe network
 app.post('/register-and-broadcast-node', function(res, req) {
     const newNodeUrl = req.body.newNodeUrl;
     if (bitcoin.networkNodes.indexOf(newNodeUrl) == -1) bitcoin.networkNodes.push(newNodeUrl);
@@ -58,16 +57,37 @@ app.post('/register-and-broadcast-node', function(res, req) {
     });
     Promise.all(regNodesPromises)
     .then(data => {
-        //...use the data
+        const bulkRegisterOptions = {
+            uri: newNodeUrl = '/register-nodes-bulk',
+            method: 'POST',
+            body: { allNetwokNodes: [ ...bitcoin.networkNodes, bitcoin.currrentNodeUrl ] },
+            json: true
+        };
+
+        return rp(bulkRegisterOptions);
+ 
+    })
+    .then(data => {
+        res.json({ note: 'New node registered with network successfully' })
     })
 });
 
 app.post('/register-node', function(req, res) {
+    const newNodeUrl = req.body.newNodeUrl;
+    const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(newNodeUrl) == -1;
+    const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
+    if(nodeNotAlreadyPresent && notCurrentNode) bitcoin.networkNodes.push(newNodeUrl);
+    res.json({ note: 'new node registered successfully.' });
+})
 
-;})
-
-app.post('/register-node-bulk', function(res, req) {
-
+app.post('/register-nodes-bulk', function(req, res) {
+    const allNetworkNodes = req.body.allNetworkNodes;
+    allNetworkNodes.forEach(networkNodeUrl =>{
+        const NodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(networkNodeUrl) == -1
+        const notCurrentNode = bitcoin.currentNodeUrl !== networkNodeUrl;
+       if(NodeNotAlreadyPresent && notCurrentNode)  bitcoin.networkNodes.push(networkNodeUrl);
+    });
+    res.json({note: 'Bulk registration successful.'});
 });
 
 
