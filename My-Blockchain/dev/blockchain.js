@@ -6,7 +6,7 @@ class Blockchain {
         this.chain = [];
         this.pendingTransactions = [];
 
-         this.currrentNodeUrl = currentNodeUrl;
+         this.currentNodeUrl = currentNodeUrl;
          this.networkNodes = [];
 
         this.createNewBlock(100, '0', '0');
